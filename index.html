@@ -4,272 +4,442 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultra Premium Formatter Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #050816;
-            --bg-card-glass: rgba(15, 23, 42, 0.75);
-            --border-gradient-light: rgba(255, 255, 255, 0.15);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --bg-dark: #030712;
+            --bg-card-glass: rgba(15, 23, 42, 0.65);
+            --border-gradient-light: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #64748b;
+            --text-muted: #475569;
             --accent-blue: #3b82f6;
             --accent-green: #10b981;
             --accent-purple: #a855f7;
             --accent-orange: #f97316;
-            --bg-input: rgba(2, 6, 23, 0.8);
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --accent-red: #ef4444;
+            --bg-input: rgba(2, 6, 23, 0.85);
+            --gold: #fbbf24;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
+            font-family: 'Inter', sans-serif;
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 0;
             position: relative;
             overflow-x: hidden;
-            
-            background-image: 
-                linear-gradient(135deg, rgba(5, 8, 22, 0.65), rgba(5, 8, 22, 0.85)),
-                radial-gradient(circle at center, transparent 0%, rgba(5, 8, 22, 0.75) 120%),
+            background: var(--bg-dark);
+        }
+
+        #particleCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+
+        .bg-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            background-image:
+                linear-gradient(135deg, rgba(3, 7, 18, 0.7), rgba(3, 7, 18, 0.9)),
+                radial-gradient(circle at center, transparent 0%, rgba(3, 7, 18, 0.8) 120%),
                 url('https://cdn.areabermain.club/assets/cdn/az7/2026/06/25/20260625/33878079ddd5ae58d19b60b739e4861c/34bef797-a0d1-4c05-87a4-11db89e096a0.jpg');
-            background-size: cover;
-            background-position: center center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
+            background-size: cover; background-position: center; background-attachment: fixed;
         }
 
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            filter: blur(120px);
-            z-index: -1;
-            opacity: 0.3;
+        .ambient-glow {
+            position: fixed; border-radius: 50%; filter: blur(140px); z-index: 0; pointer-events: none; opacity: 0.25;
         }
-        body::before {
-            background: var(--accent-blue);
-            top: -200px; left: -200px;
-            animation: float1 15s infinite alternate;
-        }
-        body::after {
-            background: var(--accent-purple);
-            bottom: -200px; right: -200px;
-            animation: float2 18s infinite alternate;
-        }
-        @keyframes float1 { 0% { transform: translate(0, 0); } 100% { transform: translate(200px, 100px); } }
-        @keyframes float2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-150px, -100px); } }
+        .glow-1 { width: 700px; height: 700px; background: var(--accent-blue); top: -250px; left: -200px; animation: glowMove1 20s ease-in-out infinite alternate; }
+        .glow-2 { width: 600px; height: 600px; background: var(--accent-purple); bottom: -200px; right: -150px; animation: glowMove2 25s ease-in-out infinite alternate; }
+        .glow-3 { width: 400px; height: 400px; background: var(--accent-cyan); top: 50%; left: 50%; transform: translate(-50%, -50%); animation: glowMove3 18s ease-in-out infinite alternate; opacity: 0.1; }
 
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
+        @keyframes glowMove1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(250px, 120px) scale(1.2); } }
+        @keyframes glowMove2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-200px, -130px) scale(1.15); } }
+        @keyframes glowMove3 { 0% { transform: translate(-50%, -50%) scale(0.8); } 100% { transform: translate(-40%, -60%) scale(1.3); } }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+        .loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999;
+            background: var(--bg-dark); display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
         }
+        .loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-ring {
+            width: 70px; height: 70px; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.05);
+            border-top: 3px solid var(--accent-blue);
+            border-right: 3px solid var(--accent-purple);
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { margin-top: 24px; font-size: 0.85rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--text-secondary); }
+        .loader-bar-track { width: 200px; height: 3px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-top: 16px; overflow: hidden; }
+        .loader-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); border-radius: 4px; transition: width 0.3s ease; }
+
+        .security-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); display: none;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+        .security-modal-overlay.show { display: flex; }
+        .security-modal-box {
+            background: linear-gradient(135deg, rgba(30,10,10,0.95), rgba(20,5,5,0.98));
+            border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 24px; padding: 50px 60px;
+            text-align: center; max-width: 480px; box-shadow: 0 0 80px rgba(239,68,68,0.2);
+        }
+        .security-modal-box .shield-icon { font-size: 3.5rem; color: var(--accent-red); margin-bottom: 20px; animation: shakeIcon 0.5s ease-in-out; }
+        @keyframes shakeIcon { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-10deg)} 75%{transform:rotate(10deg)} }
+        .security-modal-box h3 { font-size: 1.5rem; font-weight: 800; color: #fca5a5; margin-bottom: 12px; }
+        .security-modal-box p { font-size: 0.9rem; color: #f87171; line-height: 1.6; margin-bottom: 24px; }
+        .security-modal-box button {
+            background: linear-gradient(135deg, var(--accent-red), #dc2626); color: white; border: none;
+            padding: 14px 36px; border-radius: 12px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 8px 24px rgba(239,68,68,0.3);
+        }
+        .security-modal-box button:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(239,68,68,0.5); }
+
+        .dashboard-container { max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; padding: 40px 28px 60px; }
+
+        .header { text-align: center; margin-bottom: 44px; animation: fadeSlideUp 0.8s ease-out; }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header-badge {
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(251, 191, 36, 0.08);
+            border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 50px; padding: 8px 20px;
+            margin-bottom: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--gold);
+        }
+        .header-badge i { font-size: 0.7rem; }
+
         .header h1 {
-            font-size: 3rem;
-            font-weight: 900;
-            letter-spacing: -2px;
-            background: linear-gradient(180deg, #ffffff 0%, #64748b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; letter-spacing: -2px;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(148,163,184,0.6) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 6px; line-height: 1.1;
+        }
+        .header-sub { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; letter-spacing: 1px; }
+
+        .security-bar {
+            display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 32px;
+            animation: fadeSlideUp 0.8s ease-out 0.2s both; flex-wrap: wrap;
+        }
+        .security-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 10px; padding: 8px 16px; font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-green);
+        }
+        .security-tag i { font-size: 0.65rem; }
+        .security-tag.warn {
+            background: rgba(251, 191, 36, 0.06); border-color: rgba(251, 191, 36, 0.15); color: var(--gold);
         }
 
         .mode-switcher {
-            display: inline-flex;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-gradient-light);
-            border-radius: 16px;
-            padding: 8px;
-            gap: 5px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            flex-wrap: wrap;
-            justify-content: center;
+            display: inline-flex; background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-gradient-light); border-radius: 18px;
+            padding: 6px; gap: 4px; margin-bottom: 36px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+            flex-wrap: wrap; justify-content: center;
+            animation: fadeSlideUp 0.8s ease-out 0.3s both;
         }
         .mode-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            z-index: 1;
+            background: transparent; border: none; color: var(--text-secondary);
+            padding: 13px 24px; border-radius: 13px; font-size: 0.82rem; font-weight: 700;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;
+            display: flex; align-items: center; gap: 8px;
         }
-        .mode-btn.active {
-            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
-            color: white;
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
-        }
-        .mode-btn.active.purple {
-            background: linear-gradient(135deg, var(--accent-purple), #7e22ce);
-            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.5);
-        }
-        .mode-btn.active.orange {
-            background: linear-gradient(135deg, var(--accent-orange), #ea580c);
-            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.5);
-        }
+        .mode-btn i { font-size: 0.85rem; }
+        .mode-btn:hover:not(.active) { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+
+        .mode-btn.active { color: white; }
+        .mode-btn.active.blue { background: linear-gradient(135deg, var(--accent-blue), #1d4ed8); box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4); }
+        .mode-btn.active.purple { background: linear-gradient(135deg, var(--accent-purple), #7e22ce); box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4); }
+        .mode-btn.active.orange { background: linear-gradient(135deg, var(--accent-orange), #c2410c); box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4); }
+        .mode-btn.active.pink { background: linear-gradient(135deg, var(--accent-pink), #be185d); box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4); }
+        .mode-btn.active.cyan { background: linear-gradient(135deg, var(--accent-cyan), #0e7490); box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4); }
 
         .input-card {
             background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
-                        linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(168, 85, 247, 0.5)) border-box;
-            border: 1px solid transparent;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+                        linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(168, 85, 247, 0.35), rgba(6, 182, 212, 0.2)) border-box;
+            border: 1px solid transparent; backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+            border-radius: 22px; padding: 28px; margin-bottom: 32px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            animation: fadeSlideUp 0.8s ease-out 0.4s both;
+            position: relative; overflow: hidden;
         }
+        .input-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(59,130,246,0.05), transparent, rgba(168,85,247,0.05), transparent);
+            animation: rotateBorder 12s linear infinite; z-index: -1;
+        }
+        @keyframes rotateBorder { to { transform: rotate(360deg); } }
+
         .input-label {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 15px; font-size: 0.85rem; font-weight: 700;
-            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+            font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 2.5px;
         }
         .dot-indicator {
-            width: 10px; height: 10px; background: var(--accent-green);
-            border-radius: 50%; box-shadow: 0 0 15px var(--accent-green);
+            width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent-green), 0 0 24px rgba(16,185,129,0.3);
             animation: pulse 2s infinite;
         }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
 
-        textarea {
-            width: 100%; height: 140px; background: var(--bg-input);
-            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px;
-            padding: 18px; color: var(--text-primary); font-family: 'Inter', sans-serif;
-            font-size: 14px; resize: vertical; transition: all 0.3s ease;
+        .input-row { display: flex; gap: 12px; align-items: stretch; }
+        .input-row textarea {
+            flex: 1; height: 120px; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 16px 18px; color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; resize: vertical;
+            transition: all 0.3s ease; line-height: 1.6;
         }
-        textarea:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
+        .input-row textarea:focus { outline: none; border-color: rgba(59,130,246,0.5); box-shadow: 0 0 0 4px rgba(59,130,246,0.1), 0 0 30px rgba(59,130,246,0.08); }
+        .input-row textarea::placeholder { color: var(--text-muted); }
 
-        .grid-container {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+        .input-actions { display: flex; flex-direction: column; gap: 8px; }
+        .btn-action {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary); padding: 12px 18px; border-radius: 12px;
+            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px;
+            white-space: nowrap;
         }
+        .btn-action:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); transform: translateY(-1px); }
+        .btn-action.clear:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+
+        .stats-bar {
+            display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap;
+            animation: fadeSlideUp 0.8s ease-out 0.5s both;
+        }
+        .stat-chip {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 14px 22px; flex: 1; min-width: 160px;
+            backdrop-filter: blur(12px);
+        }
+        .stat-chip .stat-icon {
+            width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .stat-chip.wd-stat .stat-icon { background: rgba(59,130,246,0.12); color: var(--accent-blue); border: 1px solid rgba(59,130,246,0.2); }
+        .stat-chip.depo-stat .stat-icon { background: rgba(16,185,129,0.12); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.2); }
+        .stat-chip.total-stat .stat-icon { background: rgba(251,191,36,0.12); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
+        .stat-chip .stat-info { display: flex; flex-direction: column; }
+        .stat-chip .stat-value { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+        .stat-chip .stat-label { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; animation: fadeSlideUp 0.8s ease-out 0.6s both; }
         @media (max-width: 1024px) { .grid-container { grid-template-columns: 1fr; } }
 
         .table-card {
-            background: var(--bg-card-glass);
-            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border-radius: 24px; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            background: var(--bg-card-glass); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+            border-radius: 22px; overflow: hidden;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
             display: flex; flex-direction: column; position: relative; border: 1px solid transparent;
+            transition: all 0.4s ease;
         }
-        .table-card.wd {
-            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
-                        linear-gradient(180deg, rgba(59, 130, 246, 0.6), rgba(255, 255, 255, 0.05)) border-box;
-        }
-        .table-card.depo {
-            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
-                        linear-gradient(180deg, rgba(16, 185, 129, 0.6), rgba(255, 255, 255, 0.05)) border-box;
-        }
-        .table-card.depo.minerapay {
-            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
-                        linear-gradient(180deg, rgba(168, 85, 247, 0.6), rgba(255, 255, 255, 0.05)) border-box;
-        }
-        .table-card.pending-mode {
-            grid-column: 1 / -1;
-            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
-                        linear-gradient(180deg, rgba(249, 115, 22, 0.6), rgba(255, 255, 255, 0.05)) border-box;
-        }
+        .table-card:hover { box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06); }
+
+        .table-card.wd { background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box, linear-gradient(180deg, rgba(59,130,246,0.45), rgba(255,255,255,0.03)) border-box; }
+        .table-card.depo { background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box, linear-gradient(180deg, rgba(16,185,129,0.45), rgba(255,255,255,0.03)) border-box; }
+        .table-card.depo.minerapay { background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box, linear-gradient(180deg, rgba(168,85,247,0.45), rgba(255,255,255,0.03)) border-box; }
+        .table-card.pending-mode { grid-column: 1 / -1; background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box, linear-gradient(180deg, rgba(249,115,22,0.45), rgba(255,255,255,0.03)) border-box; }
+        .table-card.manual-mode { grid-column: 1 / -1; background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box, linear-gradient(180deg, rgba(236,72,153,0.45), rgba(255,255,255,0.03)) border-box; }
+        .table-card.manual2-mode { grid-column: 1 / -1; background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box, linear-gradient(180deg, rgba(6,182,212,0.45), rgba(255,255,255,0.03)) border-box; }
 
         .card-header {
-            padding: 22px 28px; display: flex; justify-content: space-between;
-            align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(0, 0, 0, 0.25);
+            padding: 20px 26px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.3);
         }
         .header-title { display: flex; align-items: center; gap: 14px; }
-        .header-title h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .header-title h2 { font-size: 1rem; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; }
+
         .icon-box {
-            width: 42px; height: 42px; border-radius: 12px; display: flex;
-            align-items: center; justify-content: center; font-size: 20px; font-weight: 900;
+            width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
         }
-        .wd .icon-box { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
-        .depo .icon-box { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .depo.minerapay .icon-box { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
-        .pending-mode .icon-box { background: rgba(249, 115, 22, 0.15); color: var(--accent-orange); border: 1px solid rgba(249, 115, 22, 0.3); }
+        .wd .icon-box { background: rgba(59,130,246,0.12); color: var(--accent-blue); border: 1px solid rgba(59,130,246,0.2); }
+        .depo .icon-box { background: rgba(16,185,129,0.12); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.2); }
+        .depo.minerapay .icon-box { background: rgba(168,85,247,0.12); color: var(--accent-purple); border: 1px solid rgba(168,85,247,0.2); }
+        .pending-mode .icon-box { background: rgba(249,115,22,0.12); color: var(--accent-orange); border: 1px solid rgba(249,115,22,0.2); }
+        .manual-mode .icon-box { background: rgba(236,72,153,0.12); color: var(--accent-pink); border: 1px solid rgba(236,72,153,0.2); }
+        .manual2-mode .icon-box { background: rgba(6,182,212,0.12); color: var(--accent-cyan); border: 1px solid rgba(6,182,212,0.2); }
 
         .btn-copy-all {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-primary); padding: 10px 20px; border-radius: 10px;
-            font-size: 0.85rem; font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-primary); padding: 10px 20px; border-radius: 11px;
+            font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif;
         }
-        .wd .btn-copy-all:hover { background: var(--accent-blue); border-color: var(--accent-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
-        .depo .btn-copy-all:hover { background: var(--accent-green); border-color: var(--accent-green); box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); transform: translateY(-2px); }
-        .depo.minerapay .btn-copy-all:hover { background: var(--accent-purple); border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); transform: translateY(-2px); }
-        .pending-mode .btn-copy-all:hover { background: var(--accent-orange); border-color: var(--accent-orange); box-shadow: 0 0 20px rgba(249, 115, 22, 0.5); transform: translateY(-2px); }
+        .wd .btn-copy-all:hover { background: var(--accent-blue); border-color: var(--accent-blue); box-shadow: 0 0 24px rgba(59,130,246,0.4); transform: translateY(-2px); }
+        .depo .btn-copy-all:hover { background: var(--accent-green); border-color: var(--accent-green); box-shadow: 0 0 24px rgba(16,185,129,0.4); transform: translateY(-2px); }
+        .depo.minerapay .btn-copy-all:hover { background: var(--accent-purple); border-color: var(--accent-purple); box-shadow: 0 0 24px rgba(168,85,247,0.4); transform: translateY(-2px); }
+        .pending-mode .btn-copy-all:hover { background: var(--accent-orange); border-color: var(--accent-orange); box-shadow: 0 0 24px rgba(249,115,22,0.4); transform: translateY(-2px); }
+        .manual-mode .btn-copy-all:hover { background: var(--accent-pink); border-color: var(--accent-pink); box-shadow: 0 0 24px rgba(236,72,153,0.4); transform: translateY(-2px); }
+        .manual2-mode .btn-copy-all:hover { background: var(--accent-cyan); border-color: var(--accent-cyan); box-shadow: 0 0 24px rgba(6,182,212,0.4); transform: translateY(-2px); }
 
         .table-wrapper { overflow-x: auto; flex-grow: 1; }
         table { width: 100%; border-collapse: collapse; }
         thead th {
-            text-align: left; padding: 18px 28px; font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-secondary);
-            background: rgba(0, 0, 0, 0.35); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left; padding: 16px 26px; font-size: 0.68rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+            background: rgba(0,0,0,0.35); border-bottom: 1px solid rgba(255,255,255,0.04);
         }
         tbody td {
-            padding: 16px 28px; font-size: 0.95rem; font-weight: 500;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03); white-space: nowrap;
+            padding: 14px 26px; font-size: 0.88rem; font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.025); white-space: nowrap;
+            font-family: 'JetBrains Mono', 'Inter', sans-serif;
         }
         tbody tr { transition: all 0.2s ease; background: transparent; }
-        tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
-        
-        .copy-row-btn {
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-primary); padding: 8px 16px; border-radius: 8px;
-            cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;
-        }
-        .copy-row-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-1px); }
-        .empty-message { text-align: center; padding: 50px; color: #475569; font-style: italic; font-size: 1rem; }
+        tbody tr:hover { background: rgba(255,255,255,0.025); }
 
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+        .row-number {
+            font-size: 0.7rem; font-weight: 700; color: var(--text-muted);
+            background: rgba(255,255,255,0.03); border-radius: 6px; padding: 4px 8px;
+            min-width: 28px; text-align: center; display: inline-block;
+        }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.68rem;
+            font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .status-badge.process { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+        .status-badge.pending { background: rgba(249,115,22,0.12); color: #fb923c; border: 1px solid rgba(249,115,22,0.2); }
+        .status-badge.approved { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+        .status-badge.rejected { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+
+        .copy-row-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary); padding: 7px 14px; border-radius: 8px;
+            cursor: pointer; font-size: 0.72rem; font-weight: 700; transition: all 0.2s;
+            font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .copy-row-btn:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); transform: translateY(-1px); }
+
+        .empty-message {
+            text-align: center; padding: 60px 20px; color: var(--text-muted); font-style: italic;
+            font-size: 0.9rem; font-family: 'Inter', sans-serif;
+        }
+        .empty-message i { display: block; font-size: 2rem; margin-bottom: 12px; opacity: 0.3; }
+
+        /* Kolom kosong/ronngga di tabel depo */
+        .gap-cell {
+            width: 40px; min-width: 40px;
+            background: rgba(255,255,255,0.01);
+            border-left: 1px dashed rgba(255,255,255,0.06);
+            border-right: 1px dashed rgba(255,255,255,0.06);
+        }
+        thead th.gap-cell {
+            background: rgba(0,0,0,0.2);
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
 
         .toast {
-            position: fixed; bottom: 40px; left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(2, 6, 23, 0.9); border: 1px solid var(--accent-green);
-            color: white; padding: 18px 35px; border-radius: 14px; font-weight: 700;
-            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); opacity: 0;
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(2, 6, 23, 0.92); border: 1px solid var(--accent-green);
+            color: white; padding: 16px 32px; border-radius: 16px; font-weight: 700;
+            box-shadow: 0 12px 48px rgba(16,185,129,0.25); opacity: 0;
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 9999; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(20px);
+            z-index: 9999; display: flex; align-items: center; gap: 12px;
+            backdrop-filter: blur(24px); font-size: 0.88rem;
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast-icon {
-            width: 28px; height: 28px; background: var(--accent-green);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: #000;
+            width: 26px; height: 26px; background: var(--accent-green); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000; font-size: 0.75rem;
+        }
+
+        .footer {
+            text-align: center; padding: 40px 20px 0; color: var(--text-muted);
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+            animation: fadeSlideUp 0.8s ease-out 0.8s both;
+        }
+        .footer span { color: var(--accent-blue); }
+
+        @media (max-width: 768px) {
+            .dashboard-container { padding: 24px 14px 40px; }
+            .header h1 { font-size: 1.8rem; }
+            .mode-btn { padding: 10px 16px; font-size: 0.75rem; }
+            .mode-btn i { display: none; }
+            .input-card { padding: 18px; }
+            .input-row { flex-direction: column; }
+            .input-actions { flex-direction: row; }
+            .stats-bar { gap: 10px; }
+            .stat-chip { padding: 10px 14px; min-width: 120px; }
+            .stat-chip .stat-value { font-size: 1rem; }
+            tbody td, thead th { padding: 12px 14px; font-size: 0.78rem; }
+            .gap-cell { width: 20px; min-width: 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
     </style>
 </head>
 <body>
 
+<div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Initializing</div>
+    <div class="loader-bar-track"><div class="loader-bar-fill" id="loaderBar"></div></div>
+</div>
+
+<div class="security-modal-overlay" id="securityModal">
+    <div class="security-modal-box">
+        <div class="shield-icon"><i class="fas fa-shield-halved"></i></div>
+        <h3>Akses Ditolak</h3>
+        <p>Inspect Element dan View Source dinonaktifkan untuk keamanan aplikasi ini.</p>
+        <button onclick="document.getElementById('securityModal').classList.remove('show')">Mengerti</button>
+    </div>
+</div>
+
+<div class="bg-layer"></div>
+<div class="ambient-glow glow-1"></div>
+<div class="ambient-glow glow-2"></div>
+<div class="ambient-glow glow-3"></div>
+<canvas id="particleCanvas"></canvas>
+
 <div class="dashboard-container">
     <div class="header">
-        <h1>SHORCAT WIHDRAW</h1>
+        <div class="header-badge">
+            <i class="fas fa-crown"></i> Premium Formatter Pro
+        </div>
+        <h1>SHORTCUT WITHDRAW HENDRA</h1>
+        <div class="header-sub">HENDRA DAN AMEN BERSATU</div>
+
+        <div class="security-bar">
+            <div class="security-tag"><i class="fas fa-lock"></i> Source Protected</div>
+            <div class="security-tag"><i class="fas fa-ban"></i> DevTools Blocked</div>
+            <div class="security-tag warn"><i class="fas fa-fingerprint"></i> Secured Session</div>
+        </div>
+
         <div class="mode-switcher">
-            <button id="btn-v2mih" class="mode-btn active" onclick="switchMode('v2mih')">V2MIH Format</button>
-            <button id="btn-minerapay" class="mode-btn" onclick="switchMode('minerapay')">Minerapay Format</button>
-            <button id="btn-pending" class="mode-btn" onclick="switchMode('pending')">Auto robot Pwr</button>
+            <button id="btn-v2mih" class="mode-btn active blue" onclick="switchMode('v2mih')">
+                <i class="fas fa-bolt"></i> SC V2MIH
+            </button>
+            <button id="btn-minerapay" class="mode-btn" onclick="switchMode('minerapay')">
+                <i class="fas fa-gem"></i> SC MINERPAY
+            </button>
+            <button id="btn-pending" class="mode-btn" onclick="switchMode('pending')">
+                <i class="fas fa-clock"></i> SC ROBOT PWR
+            </button>
+            <button id="btn-manual" class="mode-btn" onclick="switchMode('manual')">
+                <i class="fas fa-user-shield"></i> SC ADMIN
+            </button>
+            <button id="btn-manual2" class="mode-btn" onclick="switchMode('manual2')">
+                <i class="fas fa-file-invoice-dollar"></i> SC REPORT SALDO
+            </button>
         </div>
     </div>
 
@@ -278,23 +448,57 @@
             <div class="dot-indicator"></div>
             Tempel Data Mentah Transaksi (<span id="modeLabel">V2MIH</span>)
         </div>
-        <textarea id="inputData" placeholder="Klik kanan di sini lalu Paste (Ctrl+V)..." oninput="processData()"></textarea>
+        <div class="input-row">
+            <textarea id="inputData" placeholder="Klik kanan di sini lalu Paste (Ctrl+V)..." oninput="processData()"></textarea>
+            <div class="input-actions">
+                <button class="btn-action" onclick="document.getElementById('inputData').value='';processData();">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button class="btn-action" onclick="pasteFromClipboard()">
+                    <i class="fas fa-paste"></i> Paste
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-chip wd-stat">
+            <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="wdCount">0</div>
+                <div class="stat-label" id="wdStatLabel">WD Records</div>
+            </div>
+        </div>
+        <div class="stat-chip depo-stat">
+            <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="depoCount">0</div>
+                <div class="stat-label" id="depoStatLabel">Depo Records</div>
+            </div>
+        </div>
+        <div class="stat-chip total-stat">
+            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="totalNominal">Rp 0</div>
+                <div class="stat-label">Total Nominal</div>
+            </div>
+        </div>
     </div>
 
     <div class="grid-container">
         <div class="table-card wd" id="cardWd">
             <div class="card-header">
                 <div class="header-title">
-                    <div class="icon-box">↓</div>
+                    <div class="icon-box"><i class="fas fa-arrow-down"></i></div>
                     <h2 id="wdTitle">Dock WD Bersih</h2>
                 </div>
-                <button class="btn-copy-all" onclick="copyAll('wd')">Copy All</button>
+                <button class="btn-copy-all" onclick="copyAll('wd')"><i class="fas fa-copy"></i> Copy All</button>
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead id="wdHead"></thead>
                     <tbody id="wdBody">
-                        <tr><td colspan="6" class="empty-message">Belum ada data</td></tr>
+                        <tr><td colspan="8" class="empty-message"><i class="fas fa-inbox"></i>Belum ada data</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -303,20 +507,24 @@
         <div class="table-card depo" id="cardDepo">
             <div class="card-header" id="depoHeader">
                 <div class="header-title">
-                    <div class="icon-box">↑</div>
+                    <div class="icon-box"><i class="fas fa-arrow-up"></i></div>
                     <h2 id="depoTitle">Dock Depo QRIS</h2>
                 </div>
-                <button class="btn-copy-all" onclick="copyAll('depo')">Copy All</button>
+                <button class="btn-copy-all" onclick="copyAll('depo')"><i class="fas fa-copy"></i> Copy All</button>
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead id="depoHead"></thead>
                     <tbody id="depoBody">
-                        <tr><td colspan="6" class="empty-message">Belum ada data</td></tr>
+                        <tr><td colspan="9" class="empty-message"><i class="fas fa-inbox"></i>Belum ada data</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
+    </div>
+
+    <div class="footer">
+        Powered by <span>Hendra Formatter</span> &mdash; Secured &amp; Encrypted Session
     </div>
 </div>
 
@@ -326,284 +534,468 @@
 </div>
 
 <script>
-    let currentMode = 'v2mih';
-    let wdData = [];
-    let depoData = [];
+    /* ============================================
+       SECURITY: Block Ctrl+U, F12, DevTools
+    ============================================ */
+    (function() {
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); e.stopPropagation(); showSecurityWarning(); return false; }
+            if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) { e.preventDefault(); e.stopPropagation(); showSecurityWarning(); return false; }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) { e.preventDefault(); e.stopPropagation(); showSecurityWarning(); return false; }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) { e.preventDefault(); e.stopPropagation(); showSecurityWarning(); return false; }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) { e.preventDefault(); e.stopPropagation(); showSecurityWarning(); return false; }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'K' || e.key === 'k' || e.keyCode === 75)) { e.preventDefault(); e.stopPropagation(); showSecurityWarning(); return false; }
+            if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) { e.preventDefault(); e.stopPropagation(); showSecurityWarning(); return false; }
+        }, true);
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); showSecurityWarning(); return false; });
+        var devToolsOpen = false, threshold = 160;
+        setInterval(function() {
+            var start = performance.now(); debugger; var end = performance.now();
+            if (end - start > threshold) { if (!devToolsOpen) { devToolsOpen = true; showSecurityWarning(); } } else { devToolsOpen = false; }
+        }, 1000);
+        var element = new Image();
+        Object.defineProperty(element, 'id', { get: function() { devtools.open = true; showSecurityWarning(); } });
+        var devtools = { open: false };
+        setInterval(function() { devtools.open = false; console.log(element); console.clear(); }, 3000);
+    })();
 
-    // Fungsi Helper untuk menambahkan Prefix E-Wallet
+    function showSecurityWarning() { document.getElementById('securityModal').classList.add('show'); }
+
+    /* ============================================
+       LOADING SCREEN
+    ============================================ */
+    (function() {
+        var bar = document.getElementById('loaderBar'), progress = 0;
+        var interval = setInterval(function() {
+            progress += Math.random() * 25 + 10;
+            if (progress >= 100) { progress = 100; bar.style.width = '100%'; clearInterval(interval); setTimeout(function() { document.getElementById('loadingScreen').classList.add('hidden'); }, 400); }
+            else { bar.style.width = progress + '%'; }
+        }, 200);
+    })();
+
+    /* ============================================
+       PARTICLE SYSTEM
+    ============================================ */
+    (function() {
+        var canvas = document.getElementById('particleCanvas'), ctx = canvas.getContext('2d'), particles = [], particleCount = 50;
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function Particle() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.vx = (Math.random() - 0.5) * 0.3; this.vy = (Math.random() - 0.5) * 0.3; this.radius = Math.random() * 1.5 + 0.5; this.opacity = Math.random() * 0.3 + 0.05; }
+        for (var i = 0; i < particleCount; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(function(p) { p.x += p.vx; p.y += p.vy; if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0; if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(148,163,184,' + p.opacity + ')'; ctx.fill(); });
+            for (var i = 0; i < particles.length; i++) { for (var j = i + 1; j < particles.length; j++) { var dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx * dx + dy * dy); if (dist < 150) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(148,163,184,' + (0.04 * (1 - dist / 150)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
+
+    /* ============================================
+       MAIN APPLICATION LOGIC
+    ============================================ */
+    var currentMode = 'v2mih';
+    var wdData = [];
+    var depoData = [];
+
     function applyEwalletPrefix(bank, noRek) {
-        let upperBank = bank.toUpperCase();
-        if (upperBank === 'DANA') return '3901' + noRek;
-        if (upperBank === 'LINKAJA') return '09110' + noRek;
-        if (upperBank === 'OVO') return '39358' + noRek;
-        if (upperBank === 'GOPAY') return '70001' + noRek;
-        return noRek; // Kembalikan noRek asli jika bukan E-Wallet
+        var u = bank.toUpperCase();
+        if (u === 'DANA') return '3901' + noRek;
+        if (u === 'LINKAJA') return '09110' + noRek;
+        if (u === 'OVO') return '39358' + noRek;
+        if (u === 'GOPAY') return '70001' + noRek;
+        return noRek;
+    }
+
+    function pasteFromClipboard() {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(function(text) { document.getElementById('inputData').value = text; processData(); showToast('Data berhasil ditempel!'); }).catch(function() { showToast('Gagal mengakses clipboard.', true); });
+        } else { showToast('Browser tidak mendukung auto-paste.', true); }
     }
 
     function switchMode(mode) {
         currentMode = mode;
-        
-        document.getElementById('btn-v2mih').classList.remove('active', 'purple', 'orange');
-        document.getElementById('btn-minerapay').classList.remove('active', 'purple', 'orange');
-        document.getElementById('btn-pending').classList.remove('active', 'purple', 'orange');
-        
-        document.getElementById('btn-v2mih').classList.toggle('active', mode === 'v2mih');
-        document.getElementById('btn-minerapay').classList.toggle('active', mode === 'minerapay');
-        document.getElementById('btn-minerapay').classList.toggle('purple', mode === 'minerapay');
-        document.getElementById('btn-pending').classList.toggle('active', mode === 'pending');
-        document.getElementById('btn-pending').classList.toggle('orange', mode === 'pending');
-        
-        const cardWd = document.getElementById('cardWd');
-        const cardDepo = document.getElementById('cardDepo');
-        const depoHeader = document.getElementById('depoHeader');
-        
-        cardWd.className = 'table-card wd';
-        cardDepo.className = 'table-card depo';
-        depoHeader.classList.remove('minerapay');
+        document.querySelectorAll('.mode-btn').forEach(function(btn) { btn.classList.remove('active', 'blue', 'purple', 'orange', 'pink', 'cyan'); });
+        var btnMap = { v2mih: 'blue', minerapay: 'purple', pending: 'orange', manual: 'pink', manual2: 'cyan' };
+        var activeBtn = document.getElementById('btn-' + mode);
+        if (activeBtn) activeBtn.classList.add('active', btnMap[mode]);
 
-        if(mode === 'v2mih') {
+        var cardWd = document.getElementById('cardWd'), cardDepo = document.getElementById('cardDepo'), depoHeader = document.getElementById('depoHeader');
+        cardWd.className = 'table-card wd'; cardDepo.className = 'table-card depo'; depoHeader.classList.remove('minerapay');
+
+        if (mode === 'v2mih') {
             document.getElementById('modeLabel').innerText = 'V2MIH';
             document.getElementById('wdTitle').innerText = 'Dock WD Bersih';
             document.getElementById('depoTitle').innerText = 'Dock Depo QRIS';
+            document.getElementById('wdStatLabel').innerText = 'WD Records';
+            document.getElementById('depoStatLabel').innerText = 'Depo Records';
             cardDepo.style.display = 'flex';
-        } else if(mode === 'minerapay') {
+        } else if (mode === 'minerapay') {
             document.getElementById('modeLabel').innerText = 'Minerapay';
             document.getElementById('wdTitle').innerText = 'Dock WD Bersih';
             document.getElementById('depoTitle').innerText = 'Data Tempel Ke Dock Depo';
-            cardDepo.className = 'table-card depo minerapay';
-            depoHeader.classList.add('minerapay');
+            document.getElementById('wdStatLabel').innerText = 'WD Records';
+            document.getElementById('depoStatLabel').innerText = 'Depo Records';
+            cardDepo.className = 'table-card depo minerapay'; depoHeader.classList.add('minerapay');
             cardDepo.style.display = 'flex';
-        } else if(mode === 'pending') {
+        } else if (mode === 'pending') {
             document.getElementById('modeLabel').innerText = 'Pending';
             document.getElementById('wdTitle').innerText = 'Data Pending Format';
-            cardWd.className = 'table-card wd pending-mode';
-            cardDepo.style.display = 'none';
+            document.getElementById('wdStatLabel').innerText = 'Pending Records';
+            document.getElementById('depoStatLabel').innerText = 'Depo Records';
+            cardWd.className = 'table-card wd pending-mode'; cardDepo.style.display = 'none';
+        } else if (mode === 'manual') {
+            document.getElementById('modeLabel').innerText = 'Manual WD 1';
+            document.getElementById('wdTitle').innerText = 'Data Manual WD Format';
+            document.getElementById('wdStatLabel').innerText = 'Manual Records';
+            document.getElementById('depoStatLabel').innerText = 'Depo Records';
+            cardWd.className = 'table-card wd manual-mode'; cardDepo.style.display = 'none';
+        } else if (mode === 'manual2') {
+            document.getElementById('modeLabel').innerText = 'Manual WD 2';
+            document.getElementById('wdTitle').innerText = 'Data Manual WD Format';
+            document.getElementById('wdStatLabel').innerText = 'Manual Records';
+            document.getElementById('depoStatLabel').innerText = 'Depo Records';
+            cardWd.className = 'table-card wd manual2-mode'; cardDepo.style.display = 'none';
         }
-
-        updateHeaders();
-        document.getElementById('inputData').value = '';
-        processData();
+        updateHeaders(); document.getElementById('inputData').value = ''; processData();
     }
 
     function updateHeaders() {
-        const wdHead = document.getElementById('wdHead');
-        const depoHead = document.getElementById('depoHead');
+        var wdHead = document.getElementById('wdHead'), depoHead = document.getElementById('depoHead');
 
-        if(currentMode === 'v2mih') {
-            wdHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>User ID</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>`;
-            depoHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>User ID</th><th>Order ID</th><th>Nominal</th><th>Aksi</th></tr>`;
-        } else if(currentMode === 'minerapay') {
-            wdHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>`;
-            depoHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>Nama Rek</th><th>Order ID</th><th>Nominal</th><th>Aksi</th></tr>`;
-        } else if(currentMode === 'pending') {
-            wdHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>User ID</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>`;
-            depoHead.innerHTML = ``;
+        if (currentMode === 'v2mih') {
+            wdHead.innerHTML = '<tr><th>#</th><th>Bank</th><th>No Rek</th><th>User ID</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>';
+            /* Depo: ada kolom rongga antara Order ID dan Nominal */
+            depoHead.innerHTML = '<tr><th>#</th><th>Bank</th><th>No Rek</th><th>User ID</th><th>Order ID</th><th class="gap-cell"></th><th>Nominal</th><th>Aksi</th></tr>';
+        } else if (currentMode === 'minerapay') {
+            wdHead.innerHTML = '<tr><th>#</th><th>Bank</th><th>No Rek</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>';
+            /* Depo: ada kolom rongga antara Order ID dan Nominal */
+            depoHead.innerHTML = '<tr><th>#</th><th>Bank</th><th>No Rek</th><th>Nama Rek</th><th>Order ID</th><th class="gap-cell"></th><th>Nominal</th><th>Aksi</th></tr>';
+        } else if (currentMode === 'pending') {
+            wdHead.innerHTML = '<tr><th>#</th><th>Status</th><th>Bank</th><th>No Rek</th><th>User ID</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>';
+            depoHead.innerHTML = '';
+        } else {
+            wdHead.innerHTML = '<tr><th>#</th><th>Bank</th><th>No Rek</th><th>User ID</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>';
+            depoHead.innerHTML = '';
         }
     }
 
     function formatRupiah(str) {
-        if (!str) return "";
-        let cleanStr = str.replace(/\./g, '');
+        if (!str) return '';
+        var cleanStr = str.replace(/\./g, '');
         return cleanStr.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
     function cleanNominal(str) {
-        if (!str) return "";
+        if (!str) return '';
         return str.replace(/Rp/g, '').replace(/\s/g, '').trim();
     }
 
-    function fallbackCopyText(text) {
-        let textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            showToast("Data berhasil disalin!");
-        } catch (err) {
-            showToast("Gagal menyalin data!", true);
+    function parseNominal(raw) {
+        if (!raw) return '';
+        var s = raw.trim();
+        if (s.indexOf('.') !== -1 && s.indexOf(',') !== -1) {
+            var parts = s.split('.'); s = parts[0].replace(/,/g, ''); return formatRupiah(s);
         }
+        if (s.indexOf('.') !== -1 && s.indexOf(',') === -1) {
+            var segs = s.split('.'); var lastSeg = segs[segs.length - 1];
+            if (lastSeg.length === 3 && segs.length > 1) { s = s.replace(/\./g, ''); return formatRupiah(s); }
+            if (lastSeg.length <= 2) { s = segs.slice(0, -1).join(''); return formatRupiah(s); }
+        }
+        if (s.indexOf(',') !== -1 && s.indexOf('.') === -1) return s;
+        return formatRupiah(s);
+    }
+
+    function fallbackCopyText(text) {
+        var textarea = document.createElement('textarea');
+        textarea.value = text; textarea.style.position = 'fixed'; textarea.style.opacity = '0';
+        document.body.appendChild(textarea); textarea.focus(); textarea.select();
+        try { document.execCommand('copy'); showToast('Data berhasil disalin!'); } catch (err) { showToast('Gagal menyalin data!', true); }
         document.body.removeChild(textarea);
     }
 
-    function showToast(message, isError = false) {
-        const toast = document.getElementById('toast');
-        document.getElementById('toastText').innerText = message;
-        const icon = toast.querySelector('.toast-icon');
-        
-        if(isError) {
-            toast.style.borderColor = "#ef4444";
-            toast.style.boxShadow = "0 10px 40px rgba(239, 68, 68, 0.3)";
-            icon.style.background = "#ef4444";
-            icon.innerText = "!";
-        } else {
-            toast.style.borderColor = "var(--accent-green)";
-            toast.style.boxShadow = "0 10px 40px rgba(16, 185, 129, 0.3)";
-            icon.style.background = "var(--accent-green)";
-            icon.innerText = "✓";
-        }
-
+    function showToast(message, isError) {
+        var toast = document.getElementById('toast'); document.getElementById('toastText').innerText = message;
+        var icon = toast.querySelector('.toast-icon');
+        if (isError) { toast.style.borderColor = '#ef4444'; toast.style.boxShadow = '0 12px 48px rgba(239,68,68,0.25)'; icon.style.background = '#ef4444'; icon.innerText = '!'; }
+        else { toast.style.borderColor = 'var(--accent-green)'; toast.style.boxShadow = '0 12px 48px rgba(16,185,129,0.25)'; icon.style.background = 'var(--accent-green)'; icon.innerText = '✓'; }
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2000);
+        setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    }
+
+    function updateStats() {
+        document.getElementById('wdCount').innerText = wdData.length;
+        document.getElementById('depoCount').innerText = depoData.length;
+        var total = 0;
+        wdData.forEach(function(row) { var nomStr = row[row.length - 1] + ''; var cleaned = nomStr.replace(/,/g, '').replace(/\./g, ''); var num = parseInt(cleaned, 10); if (!isNaN(num)) total += num; });
+        document.getElementById('totalNominal').innerText = 'Rp ' + total.toLocaleString('id-ID');
     }
 
     function processData() {
-        const input = document.getElementById('inputData').value;
-        const wdBody = document.getElementById('wdBody');
-        const depoBody = document.getElementById('depoBody');
-        
-        wdBody.innerHTML = '';
-        depoBody.innerHTML = '';
-        wdData = [];
-        depoData = [];
+        var input = document.getElementById('inputData').value;
+        var wdBody = document.getElementById('wdBody'), depoBody = document.getElementById('depoBody');
+        wdBody.innerHTML = ''; depoBody.innerHTML = ''; wdData = []; depoData = [];
 
         if (!input.trim()) {
-            wdBody.innerHTML = `<tr><td colspan="6" class="empty-message">Belum ada data</td></tr>`;
-            depoBody.innerHTML = `<tr><td colspan="6" class="empty-message">Belum ada data</td></tr>`;
-            return;
+            wdBody.innerHTML = '<tr><td colspan="8" class="empty-message"><i class="fas fa-inbox"></i>Belum ada data</td></tr>';
+            depoBody.innerHTML = '<tr><td colspan="9" class="empty-message"><i class="fas fa-inbox"></i>Belum ada data</td></tr>';
+            updateStats(); return;
         }
 
-        if(currentMode === 'v2mih') {
-            processV2MIH(input, wdBody, depoBody);
-        } else if(currentMode === 'minerapay') {
-            processMinerapay(input, wdBody, depoBody);
-        } else if(currentMode === 'pending') {
-            processPending(input, wdBody);
-        }
+        if (currentMode === 'v2mih') processV2MIH(input, wdBody, depoBody);
+        else if (currentMode === 'minerapay') processMinerapay(input, wdBody, depoBody);
+        else if (currentMode === 'pending') processPending(input, wdBody);
+        else if (currentMode === 'manual') processManual(input, wdBody);
+        else if (currentMode === 'manual2') processManual2(input, wdBody);
+
+        if (!wdBody.innerHTML) wdBody.innerHTML = '<tr><td colspan="8" class="empty-message"><i class="fas fa-inbox"></i>Belum ada data</td></tr>';
+        if (!depoBody.innerHTML && cardDepoVisible()) depoBody.innerHTML = '<tr><td colspan="9" class="empty-message"><i class="fas fa-inbox"></i>Belum ada data</td></tr>';
+        updateStats();
     }
 
+    function cardDepoVisible() { return currentMode === 'v2mih' || currentMode === 'minerapay'; }
+
+    /* =============================================
+       MODE 1: V2MIH
+       Depo format saat copy:
+       Bank \t NoRek \t User \t OrderID \t \t -Nominal
+       (ada 1 tab kosong/ronngga sebelum nominal)
+    ============================================= */
     function processV2MIH(input, wdBody, depoBody) {
-        const blocks = input.split(/(?=Order\s*:)/);
-        blocks.forEach(block => {
-            if (!block.includes("Bank :")) return;
+        var blocks = input.split(/(?=Order\s*:)/);
+        blocks.forEach(function(block) {
+            if (!block.includes('Bank :')) return;
 
-            const orderMatch = block.match(/Order\s*:\s*([^\r\n]+)/);
-            const bankMatch = block.match(/Bank\s*:\s*([^\r\n]+)/);
-            const namaMatch = block.match(/Nama Rek\s*:\s*([^\r\n]+)/);
-            const noRekMatch = block.match(/No Rek\s*:\s*([^\r\n]+)/);
-            const userMatch = block.match(/\n([a-zA-Z0-9_]+)\s*\t\s*([\d\.]+)/);
-            
+            var orderMatch = block.match(/Order\s*:\s*([^\r\n]+)/);
+            var bankMatch = block.match(/Bank\s*:\s*([^\r\n]+)/);
+            var namaMatch = block.match(/Nama Rek\s*:\s*([^\r\n]+)/);
+            var noRekMatch = block.match(/No Rek\s*:\s*([^\r\n]+)/);
+            var userMatch = block.match(/\n([a-zA-Z0-9_]+)\s*\t\s*([\d\.]+)/);
+
             if (bankMatch && namaMatch && noRekMatch && userMatch) {
-                let bank = bankMatch[1].trim().toUpperCase();
-                let nama = namaMatch[1].trim();
-                let noRek = noRekMatch[1].trim();
-                
-                // Terapkan Prefix E-Wallet
-                noRek = applyEwalletPrefix(bank, noRek);
+                var bank = bankMatch[1].trim().toUpperCase();
+                var nama = namaMatch[1].trim();
+                var noRek = applyEwalletPrefix(bank, noRekMatch[1].trim());
+                var user = userMatch[1].trim();
+                var nominalRaw = userMatch[2].trim();
+                var order = orderMatch ? orderMatch[1].trim() : '';
+                var formattedNominal = formatRupiah(nominalRaw);
+                var depoNominal = '-' + formattedNominal;
 
-                let user = userMatch[1].trim();
-                let nominalRaw = userMatch[2].trim();
-                let order = orderMatch ? orderMatch[1].trim() : '';
+                var idxWd = wdData.length;
+                var idxDepo = depoData.length;
 
-                let formattedNominal = formatRupiah(nominalRaw);
-                let depoNominal = '-' + formattedNominal;
+                /* WD data — tanpa rongga */
+                wdData.push([bank, noRek, user, nama, formattedNominal]);
 
-                let wdRow = [bank, noRek, user, nama, formattedNominal];
-                let depoRow = [bank, noRek, user, order, '', depoNominal];
+                /* Depo data — DENGAN 1 kolom rongga (string kosong) sebelum nominal */
+                depoData.push([bank, noRek, user, order, '', depoNominal]);
 
-                wdData.push(wdRow);
-                depoData.push(depoRow);
+                /* Render WD row */
+                wdBody.insertAdjacentHTML('beforeend',
+                    '<tr>' +
+                    '<td><span class="row-number">' + (idxWd + 1) + '</span></td>' +
+                    '<td>' + bank + '</td>' +
+                    '<td>' + noRek + '</td>' +
+                    '<td>' + user + '</td>' +
+                    '<td>' + nama + '</td>' +
+                    '<td>' + formattedNominal + '</td>' +
+                    '<td><button class="copy-row-btn" onclick="copyRow(\'wd\',' + idxWd + ')"><i class="fas fa-copy"></i> Copy</button></td>' +
+                    '</tr>');
 
-                wdBody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${bank}</td><td>${noRek}</td><td>${user}</td><td>${nama}</td><td>${formattedNominal}</td>
-                        <td><button class="copy-row-btn" onclick="copyRow('wd', ${wdData.length - 1})">Copy</button></td>
-                    </tr>
-                `);
-                depoBody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${bank}</td><td>${noRek}</td><td>${user}</td><td>${order}</td><td style="color: #f87171;">${depoNominal}</td>
-                        <td><button class="copy-row-btn" onclick="copyRow('depo', ${depoData.length - 1})">Copy</button></td>
-                    </tr>
-                `);
+                /* Render Depo row — dengan kolom rongga (gap-cell) antara Order ID dan Nominal */
+                depoBody.insertAdjacentHTML('beforeend',
+                    '<tr>' +
+                    '<td><span class="row-number">' + (idxDepo + 1) + '</span></td>' +
+                    '<td>' + bank + '</td>' +
+                    '<td>' + noRek + '</td>' +
+                    '<td>' + user + '</td>' +
+                    '<td>' + order + '</td>' +
+                    '<td class="gap-cell"></td>' +
+                    '<td style="color:#f87171">' + depoNominal + '</td>' +
+                    '<td><button class="copy-row-btn" onclick="copyRow(\'depo\',' + idxDepo + ')"><i class="fas fa-copy"></i> Copy</button></td>' +
+                    '</tr>');
             }
         });
     }
 
+    /* =============================================
+       MODE 2: MINERAPAY
+       Depo format saat copy:
+       Bank \t NoRek \t NamaRek \t OrderID \t \t (Nominal)
+       (ada 1 tab kosong/ronngga sebelum nominal)
+    ============================================= */
     function processMinerapay(input, wdBody, depoBody) {
-        const lines = input.trim().split('\n');
-        lines.forEach(line => {
+        var lines = input.trim().split('\n');
+        lines.forEach(function(line) {
             if (!line.trim()) return;
-            const cols = line.split('\t');
+            var cols = line.split('\t');
             if (cols.length >= 8) {
-                let bank = cols[4].trim().toUpperCase();
-                let noRek = cols[5].trim();
-                
-                // Terapkan Prefix E-Wallet
-                noRek = applyEwalletPrefix(bank, noRek);
+                var bank = cols[4].trim().toUpperCase();
+                var noRek = applyEwalletPrefix(bank, cols[5].trim());
+                var namaRek = cols[6].trim();
+                var orderId = cols[3].trim();
+                var nominalRaw = cleanNominal(cols[7]);
+                if (!nominalRaw) return;
 
-                let namaRek = cols[6].trim();
-                let orderId = cols[3].trim();
-                let nominalRaw = cleanNominal(cols[7]); 
-                
-                if(!nominalRaw) return;
+                var depoNominal = '(' + nominalRaw + ')';
+                var idxWd = wdData.length;
+                var idxDepo = depoData.length;
 
-                let wdRow = [bank, noRek, '', namaRek, nominalRaw];
-                let depoNominal = `(${nominalRaw})`;
-                let depoRow = [bank, noRek, namaRek, orderId, '', depoNominal];
+                /* WD data — tanpa rongga */
+                wdData.push([bank, noRek, '', namaRek, nominalRaw]);
 
-                wdData.push(wdRow);
-                depoData.push(depoRow);
+                /* Depo data — DENGAN 1 kolom rongga (string kosong) sebelum nominal */
+                depoData.push([bank, noRek, namaRek, orderId, '', depoNominal]);
 
-                wdBody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${bank}</td><td>${noRek}</td><td>${namaRek}</td><td>${nominalRaw}</td>
-                        <td><button class="copy-row-btn" onclick="copyRow('wd', ${wdData.length - 1})">Copy</button></td>
-                    </tr>
-                `);
-                depoBody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${bank}</td><td>${noRek}</td><td>${namaRek}</td><td>${orderId}</td><td style="color: #f87171;">${depoNominal}</td>
-                        <td><button class="copy-row-btn" onclick="copyRow('depo', ${depoData.length - 1})">Copy</button></td>
-                    </tr>
-                `);
+                /* Render WD row */
+                wdBody.insertAdjacentHTML('beforeend',
+                    '<tr>' +
+                    '<td><span class="row-number">' + (idxWd + 1) + '</span></td>' +
+                    '<td>' + bank + '</td>' +
+                    '<td>' + noRek + '</td>' +
+                    '<td>' + namaRek + '</td>' +
+                    '<td>' + nominalRaw + '</td>' +
+                    '<td><button class="copy-row-btn" onclick="copyRow(\'wd\',' + idxWd + ')"><i class="fas fa-copy"></i> Copy</button></td>' +
+                    '</tr>');
+
+                /* Render Depo row — dengan kolom rongga (gap-cell) antara Order ID dan Nominal */
+                depoBody.insertAdjacentHTML('beforeend',
+                    '<tr>' +
+                    '<td><span class="row-number">' + (idxDepo + 1) + '</span></td>' +
+                    '<td>' + bank + '</td>' +
+                    '<td>' + noRek + '</td>' +
+                    '<td>' + namaRek + '</td>' +
+                    '<td>' + orderId + '</td>' +
+                    '<td class="gap-cell"></td>' +
+                    '<td style="color:#f87171">' + depoNominal + '</td>' +
+                    '<td><button class="copy-row-btn" onclick="copyRow(\'depo\',' + idxDepo + ')"><i class="fas fa-copy"></i> Copy</button></td>' +
+                    '</tr>');
             }
         });
     }
 
+    /* =============================================
+       MODE 3: PENDING / SC ROBOT PWR
+    ============================================= */
     function processPending(input, wdBody) {
-        const lines = input.trim().split('\n');
-        lines.forEach(line => {
-            let cleanLine = line.trim();
-            if (!cleanLine || !cleanLine.includes('PENDING')) return;
+        var lines = input.trim().split('\n');
+        var validStatuses = ['PROCESS', 'PENDING', 'APPROVED', 'REJECTED', 'SUCCESS', 'FAILED', 'CANCEL'];
 
-            const cols = cleanLine.split('\t');
-            
+        lines.forEach(function(line) {
+            var cleanLine = line.trim();
+            if (!cleanLine) return;
+            var cols = cleanLine.split('\t');
+            if (cols.length < 7) return;
+
+            var status = cols[0].trim().toUpperCase();
+            var isValid = false;
+            for (var s = 0; s < validStatuses.length; s++) { if (status === validStatuses[s]) { isValid = true; break; } }
+            if (!isValid) return;
+
+            var user = cols[1].trim();
+            var noRek = cols[2].trim();
+            var namaRek = cols[3].trim();
+            var nominalRaw = cols[4].trim();
+            var bank = cols[6].trim().toUpperCase();
+            noRek = applyEwalletPrefix(bank, noRek);
+            var formattedNominal = parseNominal(nominalRaw);
+
+            var statusClass = 'pending';
+            if (status === 'PROCESS') statusClass = 'process';
+            else if (status === 'APPROVED' || status === 'SUCCESS') statusClass = 'approved';
+            else if (status === 'REJECTED' || status === 'FAILED' || status === 'CANCEL') statusClass = 'rejected';
+
+            var idx = wdData.length;
+            wdData.push([bank, noRek, user, namaRek, formattedNominal]);
+
+            wdBody.insertAdjacentHTML('beforeend',
+                '<tr>' +
+                '<td><span class="row-number">' + (idx + 1) + '</span></td>' +
+                '<td><span class="status-badge ' + statusClass + '">' + status + '</span></td>' +
+                '<td>' + bank + '</td>' +
+                '<td>' + noRek + '</td>' +
+                '<td>' + user + '</td>' +
+                '<td>' + namaRek + '</td>' +
+                '<td>' + formattedNominal + '</td>' +
+                '<td><button class="copy-row-btn" onclick="copyRow(\'wd\',' + idx + ')"><i class="fas fa-copy"></i> Copy</button></td>' +
+                '</tr>');
+        });
+    }
+
+    /* =============================================
+       MODE 4: MANUAL WD 1
+    ============================================= */
+    function processManual(input, wdBody) {
+        var blocks = input.trim().split(/\n(?=\d+\s*\t)/);
+        blocks.forEach(function(block) {
+            if (!block.trim()) return;
+            var lines = block.trim().split('\n');
+            if (lines.length < 4) return;
+
+            var userMatch = lines[0].match(/\t+(\w+)/);
+            if (!userMatch) return;
+            var user = userMatch[1].trim();
+
+            var colsLine2 = lines[1].split('\t');
+            if (colsLine2.length < 3) return;
+            var nominalRaw = colsLine2[2].trim();
+
+            var bankInfoLine = '';
+            for (var i = 2; i < lines.length; i++) { if (lines[i].includes(',')) { bankInfoLine = lines[i]; break; } }
+            if (!bankInfoLine) return;
+
+            var bankInfo = bankInfoLine.split(',').map(function(item) { return item.trim(); });
+            if (bankInfo.length >= 3) {
+                var bank = bankInfo[0].toUpperCase();
+                var noRek = applyEwalletPrefix(bank, bankInfo[1]);
+                var nama = bankInfo.slice(2).join(' ');
+
+                var idx = wdData.length;
+                wdData.push([bank, noRek, user, nama, nominalRaw]);
+                wdBody.insertAdjacentHTML('beforeend',
+                    '<tr><td><span class="row-number">' + (idx + 1) + '</span></td><td>' + bank + '</td><td>' + noRek + '</td><td>' + user + '</td><td>' + nama + '</td><td>' + nominalRaw + '</td><td><button class="copy-row-btn" onclick="copyRow(\'wd\',' + idx + ')"><i class="fas fa-copy"></i> Copy</button></td></tr>');
+            }
+        });
+    }
+
+    /* =============================================
+       MODE 5: MANUAL WD 2
+    ============================================= */
+    function processManual2(input, wdBody) {
+        var lines = input.trim().split('\n');
+        lines.forEach(function(line) {
+            if (!line.trim()) return;
+            var cols = line.split('\t');
             if (cols.length >= 7) {
-                let user = cols[1].trim();
-                let noRek = cols[2].trim();
-                let namaRek = cols[3].trim();
-                let nominalRaw = cols[4].trim().split('.')[0]; 
-                let bank = cols[6].trim().toUpperCase();
+                var user = cols[2].trim();
+                var bankInfoStr = cols[4].trim();
+                var nominalRaw = cols[6].trim();
 
-                // Terapkan Prefix E-Wallet
-                noRek = applyEwalletPrefix(bank, noRek);
+                var bankInfo = bankInfoStr.split(',').map(function(item) { return item.trim(); });
+                if (bankInfo.length >= 3) {
+                    var nama = bankInfo[0];
+                    var noRek = applyEwalletPrefix(bankInfo[2].toUpperCase(), bankInfo[1]);
+                    var bank = bankInfo[2].toUpperCase();
 
-                let wdRow = [bank, noRek, user, namaRek, nominalRaw];
-                wdData.push(wdRow);
-
-                wdBody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${bank}</td><td>${noRek}</td><td>${user}</td><td>${namaRek}</td><td>${nominalRaw}</td>
-                        <td><button class="copy-row-btn" onclick="copyRow('wd', ${wdData.length - 1})">Copy</button></td>
-                    </tr>
-                `);
+                    var idx = wdData.length;
+                    wdData.push([bank, noRek, user, nama, nominalRaw]);
+                    wdBody.insertAdjacentHTML('beforeend',
+                        '<tr><td><span class="row-number">' + (idx + 1) + '</span></td><td>' + bank + '</td><td>' + noRek + '</td><td>' + user + '</td><td>' + nama + '</td><td>' + nominalRaw + '</td><td><button class="copy-row-btn" onclick="copyRow(\'wd\',' + idx + ')"><i class="fas fa-copy"></i> Copy</button></td></tr>');
+                }
             }
         });
     }
 
     function copyRow(type, index) {
-        let textToCopy = type === 'wd' ? wdData[index].join('\t') : depoData[index].join('\t');
+        var textToCopy = type === 'wd' ? wdData[index].join('\t') : depoData[index].join('\t');
         fallbackCopyText(textToCopy);
     }
 
     function copyAll(type) {
-        let textToCopy = '';
-        let dataArr = type === 'wd' ? wdData : depoData;
-        dataArr.forEach(row => { textToCopy += row.join('\t') + '\n'; });
+        var textToCopy = '';
+        var dataArr = type === 'wd' ? wdData : depoData;
+        dataArr.forEach(function(row) { textToCopy += row.join('\t') + '\n'; });
         fallbackCopyText(textToCopy.trim());
     }
 
