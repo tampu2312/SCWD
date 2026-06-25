@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Premium Formatter Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050816;
+            --bg-card-glass: rgba(15, 23, 42, 0.75);
+            --border-gradient-light: rgba(255, 255, 255, 0.15);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #a855f7;
+            --accent-orange: #f97316;
+            --bg-input: rgba(2, 6, 23, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+            
+            background-image: 
+                linear-gradient(135deg, rgba(5, 8, 22, 0.65), rgba(5, 8, 22, 0.85)),
+                radial-gradient(circle at center, transparent 0%, rgba(5, 8, 22, 0.75) 120%),
+                url('https://cdn.areabermain.club/assets/cdn/az7/2026/06/25/20260625/33878079ddd5ae58d19b60b739e4861c/34bef797-a0d1-4c05-87a4-11db89e096a0.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.3;
+        }
+        body::before {
+            background: var(--accent-blue);
+            top: -200px; left: -200px;
+            animation: float1 15s infinite alternate;
+        }
+        body::after {
+            background: var(--accent-purple);
+            bottom: -200px; right: -200px;
+            animation: float2 18s infinite alternate;
+        }
+        @keyframes float1 { 0% { transform: translate(0, 0); } 100% { transform: translate(200px, 100px); } }
+        @keyframes float2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-150px, -100px); } }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            background: linear-gradient(180deg, #ffffff 0%, #64748b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .mode-switcher {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-gradient-light);
+            border-radius: 16px;
+            padding: 8px;
+            gap: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 1;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: white;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+        }
+        .mode-btn.active.purple {
+            background: linear-gradient(135deg, var(--accent-purple), #7e22ce);
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.5);
+        }
+        .mode-btn.active.orange {
+            background: linear-gradient(135deg, var(--accent-orange), #ea580c);
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.5);
+        }
+
+        .input-card {
+            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
+                        linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(168, 85, 247, 0.5)) border-box;
+            border: 1px solid transparent;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+        .input-label {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 15px; font-size: 0.85rem; font-weight: 700;
+            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px;
+        }
+        .dot-indicator {
+            width: 10px; height: 10px; background: var(--accent-green);
+            border-radius: 50%; box-shadow: 0 0 15px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } 100% { opacity: 1; transform: scale(1); } }
+
+        textarea {
+            width: 100%; height: 140px; background: var(--bg-input);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px;
+            padding: 18px; color: var(--text-primary); font-family: 'Inter', sans-serif;
+            font-size: 14px; resize: vertical; transition: all 0.3s ease;
+        }
+        textarea:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
+
+        .grid-container {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+        }
+        @media (max-width: 1024px) { .grid-container { grid-template-columns: 1fr; } }
+
+        .table-card {
+            background: var(--bg-card-glass);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            display: flex; flex-direction: column; position: relative; border: 1px solid transparent;
+        }
+        .table-card.wd {
+            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
+                        linear-gradient(180deg, rgba(59, 130, 246, 0.6), rgba(255, 255, 255, 0.05)) border-box;
+        }
+        .table-card.depo {
+            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
+                        linear-gradient(180deg, rgba(16, 185, 129, 0.6), rgba(255, 255, 255, 0.05)) border-box;
+        }
+        .table-card.depo.minerapay {
+            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
+                        linear-gradient(180deg, rgba(168, 85, 247, 0.6), rgba(255, 255, 255, 0.05)) border-box;
+        }
+        .table-card.pending-mode {
+            grid-column: 1 / -1;
+            background: linear-gradient(var(--bg-card-glass), var(--bg-card-glass)) padding-box,
+                        linear-gradient(180deg, rgba(249, 115, 22, 0.6), rgba(255, 255, 255, 0.05)) border-box;
+        }
+
+        .card-header {
+            padding: 22px 28px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.25);
+        }
+        .header-title { display: flex; align-items: center; gap: 14px; }
+        .header-title h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .icon-box {
+            width: 42px; height: 42px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; font-size: 20px; font-weight: 900;
+        }
+        .wd .icon-box { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .depo .icon-box { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .depo.minerapay .icon-box { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .pending-mode .icon-box { background: rgba(249, 115, 22, 0.15); color: var(--accent-orange); border: 1px solid rgba(249, 115, 22, 0.3); }
+
+        .btn-copy-all {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary); padding: 10px 20px; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .wd .btn-copy-all:hover { background: var(--accent-blue); border-color: var(--accent-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+        .depo .btn-copy-all:hover { background: var(--accent-green); border-color: var(--accent-green); box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); transform: translateY(-2px); }
+        .depo.minerapay .btn-copy-all:hover { background: var(--accent-purple); border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); transform: translateY(-2px); }
+        .pending-mode .btn-copy-all:hover { background: var(--accent-orange); border-color: var(--accent-orange); box-shadow: 0 0 20px rgba(249, 115, 22, 0.5); transform: translateY(-2px); }
+
+        .table-wrapper { overflow-x: auto; flex-grow: 1; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            text-align: left; padding: 18px 28px; font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.35); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        tbody td {
+            padding: 16px 28px; font-size: 0.95rem; font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03); white-space: nowrap;
+        }
+        tbody tr { transition: all 0.2s ease; background: transparent; }
+        tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+        
+        .copy-row-btn {
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary); padding: 8px 16px; border-radius: 8px;
+            cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;
+        }
+        .copy-row-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-1px); }
+        .empty-message { text-align: center; padding: 50px; color: #475569; font-style: italic; font-size: 1rem; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .toast {
+            position: fixed; bottom: 40px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(2, 6, 23, 0.9); border: 1px solid var(--accent-green);
+            color: white; padding: 18px 35px; border-radius: 14px; font-weight: 700;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 9999; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(20px);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon {
+            width: 28px; height: 28px; background: var(--accent-green);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="header">
+        <h1>SHORCAT WIHDRAW</h1>
+        <div class="mode-switcher">
+            <button id="btn-v2mih" class="mode-btn active" onclick="switchMode('v2mih')">V2MIH Format</button>
+            <button id="btn-minerapay" class="mode-btn" onclick="switchMode('minerapay')">Minerapay Format</button>
+            <button id="btn-pending" class="mode-btn" onclick="switchMode('pending')">Auto robot Pwr</button>
+        </div>
+    </div>
+
+    <div class="input-card">
+        <div class="input-label">
+            <div class="dot-indicator"></div>
+            Tempel Data Mentah Transaksi (<span id="modeLabel">V2MIH</span>)
+        </div>
+        <textarea id="inputData" placeholder="Klik kanan di sini lalu Paste (Ctrl+V)..." oninput="processData()"></textarea>
+    </div>
+
+    <div class="grid-container">
+        <div class="table-card wd" id="cardWd">
+            <div class="card-header">
+                <div class="header-title">
+                    <div class="icon-box">↓</div>
+                    <h2 id="wdTitle">Dock WD Bersih</h2>
+                </div>
+                <button class="btn-copy-all" onclick="copyAll('wd')">Copy All</button>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead id="wdHead"></thead>
+                    <tbody id="wdBody">
+                        <tr><td colspan="6" class="empty-message">Belum ada data</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-card depo" id="cardDepo">
+            <div class="card-header" id="depoHeader">
+                <div class="header-title">
+                    <div class="icon-box">↑</div>
+                    <h2 id="depoTitle">Dock Depo QRIS</h2>
+                </div>
+                <button class="btn-copy-all" onclick="copyAll('depo')">Copy All</button>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead id="depoHead"></thead>
+                    <tbody id="depoBody">
+                        <tr><td colspan="6" class="empty-message">Belum ada data</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast">
+    <div class="toast-icon">✓</div>
+    <span id="toastText">Data berhasil disalin!</span>
+</div>
+
+<script>
+    let currentMode = 'v2mih';
+    let wdData = [];
+    let depoData = [];
+
+    // Fungsi Helper untuk menambahkan Prefix E-Wallet
+    function applyEwalletPrefix(bank, noRek) {
+        let upperBank = bank.toUpperCase();
+        if (upperBank === 'DANA') return '3901' + noRek;
+        if (upperBank === 'LINKAJA') return '09110' + noRek;
+        if (upperBank === 'OVO') return '39358' + noRek;
+        if (upperBank === 'GOPAY') return '70001' + noRek;
+        return noRek; // Kembalikan noRek asli jika bukan E-Wallet
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        
+        document.getElementById('btn-v2mih').classList.remove('active', 'purple', 'orange');
+        document.getElementById('btn-minerapay').classList.remove('active', 'purple', 'orange');
+        document.getElementById('btn-pending').classList.remove('active', 'purple', 'orange');
+        
+        document.getElementById('btn-v2mih').classList.toggle('active', mode === 'v2mih');
+        document.getElementById('btn-minerapay').classList.toggle('active', mode === 'minerapay');
+        document.getElementById('btn-minerapay').classList.toggle('purple', mode === 'minerapay');
+        document.getElementById('btn-pending').classList.toggle('active', mode === 'pending');
+        document.getElementById('btn-pending').classList.toggle('orange', mode === 'pending');
+        
+        const cardWd = document.getElementById('cardWd');
+        const cardDepo = document.getElementById('cardDepo');
+        const depoHeader = document.getElementById('depoHeader');
+        
+        cardWd.className = 'table-card wd';
+        cardDepo.className = 'table-card depo';
+        depoHeader.classList.remove('minerapay');
+
+        if(mode === 'v2mih') {
+            document.getElementById('modeLabel').innerText = 'V2MIH';
+            document.getElementById('wdTitle').innerText = 'Dock WD Bersih';
+            document.getElementById('depoTitle').innerText = 'Dock Depo QRIS';
+            cardDepo.style.display = 'flex';
+        } else if(mode === 'minerapay') {
+            document.getElementById('modeLabel').innerText = 'Minerapay';
+            document.getElementById('wdTitle').innerText = 'Dock WD Bersih';
+            document.getElementById('depoTitle').innerText = 'Data Tempel Ke Dock Depo';
+            cardDepo.className = 'table-card depo minerapay';
+            depoHeader.classList.add('minerapay');
+            cardDepo.style.display = 'flex';
+        } else if(mode === 'pending') {
+            document.getElementById('modeLabel').innerText = 'Pending';
+            document.getElementById('wdTitle').innerText = 'Data Pending Format';
+            cardWd.className = 'table-card wd pending-mode';
+            cardDepo.style.display = 'none';
+        }
+
+        updateHeaders();
+        document.getElementById('inputData').value = '';
+        processData();
+    }
+
+    function updateHeaders() {
+        const wdHead = document.getElementById('wdHead');
+        const depoHead = document.getElementById('depoHead');
+
+        if(currentMode === 'v2mih') {
+            wdHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>User ID</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>`;
+            depoHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>User ID</th><th>Order ID</th><th>Nominal</th><th>Aksi</th></tr>`;
+        } else if(currentMode === 'minerapay') {
+            wdHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>`;
+            depoHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>Nama Rek</th><th>Order ID</th><th>Nominal</th><th>Aksi</th></tr>`;
+        } else if(currentMode === 'pending') {
+            wdHead.innerHTML = `<tr><th>Bank</th><th>No Rek</th><th>User ID</th><th>Nama Rek</th><th>Nominal</th><th>Aksi</th></tr>`;
+            depoHead.innerHTML = ``;
+        }
+    }
+
+    function formatRupiah(str) {
+        if (!str) return "";
+        let cleanStr = str.replace(/\./g, '');
+        return cleanStr.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function cleanNominal(str) {
+        if (!str) return "";
+        return str.replace(/Rp/g, '').replace(/\s/g, '').trim();
+    }
+
+    function fallbackCopyText(text) {
+        let textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showToast("Data berhasil disalin!");
+        } catch (err) {
+            showToast("Gagal menyalin data!", true);
+        }
+        document.body.removeChild(textarea);
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastText').innerText = message;
+        const icon = toast.querySelector('.toast-icon');
+        
+        if(isError) {
+            toast.style.borderColor = "#ef4444";
+            toast.style.boxShadow = "0 10px 40px rgba(239, 68, 68, 0.3)";
+            icon.style.background = "#ef4444";
+            icon.innerText = "!";
+        } else {
+            toast.style.borderColor = "var(--accent-green)";
+            toast.style.boxShadow = "0 10px 40px rgba(16, 185, 129, 0.3)";
+            icon.style.background = "var(--accent-green)";
+            icon.innerText = "✓";
+        }
+
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function processData() {
+        const input = document.getElementById('inputData').value;
+        const wdBody = document.getElementById('wdBody');
+        const depoBody = document.getElementById('depoBody');
+        
+        wdBody.innerHTML = '';
+        depoBody.innerHTML = '';
+        wdData = [];
+        depoData = [];
+
+        if (!input.trim()) {
+            wdBody.innerHTML = `<tr><td colspan="6" class="empty-message">Belum ada data</td></tr>`;
+            depoBody.innerHTML = `<tr><td colspan="6" class="empty-message">Belum ada data</td></tr>`;
+            return;
+        }
+
+        if(currentMode === 'v2mih') {
+            processV2MIH(input, wdBody, depoBody);
+        } else if(currentMode === 'minerapay') {
+            processMinerapay(input, wdBody, depoBody);
+        } else if(currentMode === 'pending') {
+            processPending(input, wdBody);
+        }
+    }
+
+    function processV2MIH(input, wdBody, depoBody) {
+        const blocks = input.split(/(?=Order\s*:)/);
+        blocks.forEach(block => {
+            if (!block.includes("Bank :")) return;
+
+            const orderMatch = block.match(/Order\s*:\s*([^\r\n]+)/);
+            const bankMatch = block.match(/Bank\s*:\s*([^\r\n]+)/);
+            const namaMatch = block.match(/Nama Rek\s*:\s*([^\r\n]+)/);
+            const noRekMatch = block.match(/No Rek\s*:\s*([^\r\n]+)/);
+            const userMatch = block.match(/\n([a-zA-Z0-9_]+)\s*\t\s*([\d\.]+)/);
+            
+            if (bankMatch && namaMatch && noRekMatch && userMatch) {
+                let bank = bankMatch[1].trim().toUpperCase();
+                let nama = namaMatch[1].trim();
+                let noRek = noRekMatch[1].trim();
+                
+                // Terapkan Prefix E-Wallet
+                noRek = applyEwalletPrefix(bank, noRek);
+
+                let user = userMatch[1].trim();
+                let nominalRaw = userMatch[2].trim();
+                let order = orderMatch ? orderMatch[1].trim() : '';
+
+                let formattedNominal = formatRupiah(nominalRaw);
+                let depoNominal = '-' + formattedNominal;
+
+                let wdRow = [bank, noRek, user, nama, formattedNominal];
+                let depoRow = [bank, noRek, user, order, '', depoNominal];
+
+                wdData.push(wdRow);
+                depoData.push(depoRow);
+
+                wdBody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${bank}</td><td>${noRek}</td><td>${user}</td><td>${nama}</td><td>${formattedNominal}</td>
+                        <td><button class="copy-row-btn" onclick="copyRow('wd', ${wdData.length - 1})">Copy</button></td>
+                    </tr>
+                `);
+                depoBody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${bank}</td><td>${noRek}</td><td>${user}</td><td>${order}</td><td style="color: #f87171;">${depoNominal}</td>
+                        <td><button class="copy-row-btn" onclick="copyRow('depo', ${depoData.length - 1})">Copy</button></td>
+                    </tr>
+                `);
+            }
+        });
+    }
+
+    function processMinerapay(input, wdBody, depoBody) {
+        const lines = input.trim().split('\n');
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            const cols = line.split('\t');
+            if (cols.length >= 8) {
+                let bank = cols[4].trim().toUpperCase();
+                let noRek = cols[5].trim();
+                
+                // Terapkan Prefix E-Wallet
+                noRek = applyEwalletPrefix(bank, noRek);
+
+                let namaRek = cols[6].trim();
+                let orderId = cols[3].trim();
+                let nominalRaw = cleanNominal(cols[7]); 
+                
+                if(!nominalRaw) return;
+
+                let wdRow = [bank, noRek, '', namaRek, nominalRaw];
+                let depoNominal = `(${nominalRaw})`;
+                let depoRow = [bank, noRek, namaRek, orderId, '', depoNominal];
+
+                wdData.push(wdRow);
+                depoData.push(depoRow);
+
+                wdBody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${bank}</td><td>${noRek}</td><td>${namaRek}</td><td>${nominalRaw}</td>
+                        <td><button class="copy-row-btn" onclick="copyRow('wd', ${wdData.length - 1})">Copy</button></td>
+                    </tr>
+                `);
+                depoBody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${bank}</td><td>${noRek}</td><td>${namaRek}</td><td>${orderId}</td><td style="color: #f87171;">${depoNominal}</td>
+                        <td><button class="copy-row-btn" onclick="copyRow('depo', ${depoData.length - 1})">Copy</button></td>
+                    </tr>
+                `);
+            }
+        });
+    }
+
+    function processPending(input, wdBody) {
+        const lines = input.trim().split('\n');
+        lines.forEach(line => {
+            let cleanLine = line.trim();
+            if (!cleanLine || !cleanLine.includes('PENDING')) return;
+
+            const cols = cleanLine.split('\t');
+            
+            if (cols.length >= 7) {
+                let user = cols[1].trim();
+                let noRek = cols[2].trim();
+                let namaRek = cols[3].trim();
+                let nominalRaw = cols[4].trim().split('.')[0]; 
+                let bank = cols[6].trim().toUpperCase();
+
+                // Terapkan Prefix E-Wallet
+                noRek = applyEwalletPrefix(bank, noRek);
+
+                let wdRow = [bank, noRek, user, namaRek, nominalRaw];
+                wdData.push(wdRow);
+
+                wdBody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${bank}</td><td>${noRek}</td><td>${user}</td><td>${namaRek}</td><td>${nominalRaw}</td>
+                        <td><button class="copy-row-btn" onclick="copyRow('wd', ${wdData.length - 1})">Copy</button></td>
+                    </tr>
+                `);
+            }
+        });
+    }
+
+    function copyRow(type, index) {
+        let textToCopy = type === 'wd' ? wdData[index].join('\t') : depoData[index].join('\t');
+        fallbackCopyText(textToCopy);
+    }
+
+    function copyAll(type) {
+        let textToCopy = '';
+        let dataArr = type === 'wd' ? wdData : depoData;
+        dataArr.forEach(row => { textToCopy += row.join('\t') + '\n'; });
+        fallbackCopyText(textToCopy.trim());
+    }
+
+    updateHeaders();
+</script>
+
+</body>
+</html>
